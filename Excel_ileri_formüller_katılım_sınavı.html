@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Temel Excel Quiz</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #f4f4f4;
+    text-align: center;
+}
+
+.quiz-box {
+    background: white;
+    width: 60%;
+    margin: 50px auto;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px gray;
+}
+
+button {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px;
+    border: none;
+    background: #ddd;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:hover {
+    background: #bbb;
+}
+
+.selected {
+    background-color: #4CAF50 !important;
+    color: white;
+}
+
+.nav-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.nav-buttons button {
+    width: 50%;
+}
+</style>
+</head>
+
+<body>
+
+<div class="quiz-box">
+
+    <h3 id="progress"></h3>
+    <h2 id="question">Soru yükleniyor...</h2>
+    <div id="answers"></div>
+
+    <div class="nav-buttons">
+        <button id="prevBtn" onclick="prevQuestion()">Önceki</button>
+        <button onclick="nextQuestion()">Sonraki</button>
+    </div>
+
+    <h3 id="result"></h3>
+
+</div>
+
+<script>
+
+const quiz = [
+{q:"Excel'de hücre nedir?", a:["Veri girilen kutu","Dosya türü","Sayfa adı","Formül türü"], c:0},
+{q:"Excel dosya uzantısı nedir?", a:[".docx",".xlsx",".ppt",".txt"], c:1},
+{q:"Toplama işlemi hangi fonksiyonla yapılır?", a:["AVERAGE","COUNT","SUM","MAX"], c:2},
+{q:"Excel'de sütunlar ne ile gösterilir?", a:["Rakam","Renk","Sembol","Harf"], c:3},
+{q:"Satırlar ne ile gösterilir?", a:["Harf","Renk","Rakam","Sembol"], c:2},
+{q:"Formül nasıl başlar?", a:["#","-","$","="], c:3},
+{q:"Bir hücreye metin yazmak için ne yapılır?", a:["Tıklayıp yazmak","Formül yazmak","Dosya açmak","Grafik eklemek"], c:0},
+{q:"AVERAGE ne yapar?", a:["Toplar","Çarpar","Sayar","Ortalama alır"], c:3},
+{q:"COUNT ne işe yarar?", a:["Toplama","Sayma","Bölme","Çıkarma"], c:1},
+{q:"MAX fonksiyonu nedir?", a:["En küçük","Ortalama","En büyük","Toplam"], c:2},
+{q:"MIN fonksiyonu nedir?", a:["Toplam","En büyük","Ortalama","En küçük"], c:3},
+{q:"Ctrl + C ne işe yarar?", a:["Kes","Kopyala","Yapıştır","Kaydet"], c:1},
+{q:"Ctrl + V ne işe yarar?", a:["Kopyala","Yapıştır","Kes","Sil"], c:1},
+{q:"Ctrl + S ne yapar?", a:["Sil","Kaydet","Kopyala","Aç"], c:1},
+{q:"Bir hücreyi silmek için ne yapılır?", a:["Alt","Ctrl","Shift","Delete"], c:3},
+{q:"Excel'de grafik ne işe yarar?", a:["Yazı yazmak","Veriyi görselleştirmek","Silmek","Kopyalamak"], c:1},
+{q:"Excel'de çalışma sayfasına ne denir?", a:["Page","Sheet","File","Cell"], c:1},
+{q:"Birden fazla hücre seçmek için ne yapılır?", a:["Tek tık","Seçmek","Silmek","Sürüklemek"], c:3},
+{q:"Excel'de veri türü veya karakterlerinden biri değildir?", a:["Metin","Rakam","&,()","Animasyon"], c:3},
+{q:"Formül çubuğu ne işe yarar?", a:["Video oynatır","Formül gösterir","Dosya siler","Grafik çizer"], c:1}
+];
+
+let current = 0;
+let selectedAnswer = null;
+let userAnswers = [];
+
+function loadQuestion() {
+
+    document.getElementById("result").innerText = "";
+
+    const q = quiz[current];
+
+    document.getElementById("question").innerText = q.q;
+    document.getElementById("progress").innerText = `Soru ${current + 1} / ${quiz.length}`;
+
+    const answersDiv = document.getElementById("answers");
+    answersDiv.innerHTML = "";
+
+    q.a.forEach((answer, index) => {
+        const btn = document.createElement("button");
+        btn.innerText = answer;
+
+        if (userAnswers[current] === index) {
+            btn.classList.add("selected");
+            selectedAnswer = index;
+        }
+
+        btn.onclick = () => {
+            selectedAnswer = index;
+
+            document.querySelectorAll("#answers button").forEach(b => b.classList.remove("selected"));
+            btn.classList.add("selected");
+        };
+
+        answersDiv.appendChild(btn);
+    });
+
+    // Önceki buton kontrolü
+    document.getElementById("prevBtn").disabled = current === 0;
+}
+
+function nextQuestion() {
+
+    if (selectedAnswer === null) return;
+
+    userAnswers[current] = selectedAnswer;
+
+    current++;
+
+    if (current < quiz.length) {
+        selectedAnswer = userAnswers[current] ?? null;
+        loadQuestion();
+    } else {
+
+        let score = 0;
+
+        quiz.forEach((q, i) => {
+            if (userAnswers[i] === q.c) score++;
+        });
+
+        document.getElementById("question").innerText = "Quiz Bitti!";
+        document.getElementById("answers").innerHTML = "";
+        document.getElementById("progress").innerText = "";
+        document.getElementById("result").innerText = `Puanınız: ${score} / ${quiz.length}`;
+    }
+}
+
+function prevQuestion() {
+    if (current > 0) {
+        current--;
+        selectedAnswer = userAnswers[current] ?? null;
+        loadQuestion();
+    }
+}
+
+loadQuestion();
+
+</script>
+
+</body>
+</html>
