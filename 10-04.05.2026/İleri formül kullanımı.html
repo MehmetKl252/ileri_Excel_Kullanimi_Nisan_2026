@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>İleri Excel Formül Quiz</title>
+<style>
+    body { font-family: Arial, sans-serif; background:#f4f4f4; padding:20px; }
+    .quiz-box { background:white; padding:20px; border-radius:10px; max-width:700px; margin:auto; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    
+    .answer-btn { 
+        margin-top:10px; 
+        padding:12px; 
+        cursor:pointer; 
+        display: block; 
+        width: 100%; 
+        text-align: left; 
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #fff;
+        transition: all 0.2s;
+    }
+    
+    .answer-btn:hover { background-color: #f8f8f8; }
+
+    /* Seçilen seçeneğin rengi (Mavi) */
+    .selected-choice { 
+        background-color: #007bff !important; 
+        color: white; 
+        border-color: #0056b3;
+        font-weight: bold;
+    }
+
+    #next-btn { 
+        margin-top:20px; 
+        padding:12px 25px; 
+        cursor:pointer; 
+        background-color: #28a745; 
+        color: white; 
+        border: none; 
+        border-radius: 5px; 
+        font-size: 16px;
+    }
+    #next-btn:hover { background-color: #218838; }
+</style>
+</head>
+<body>
+
+<div class="quiz-box">
+    <h2>İleri Excel Formül Quiz</h2>
+    <div id="question"></div>
+    <div id="answers"></div>
+    <button id="next-btn" onclick="nextQuestion()">Sonraki Soru</button>
+</div>
+
+<script>
+const quiz = [
+    {
+        q: "=IF(A1>50, \"Geçti\", \"Kaldı\") formülü ne yapar?",
+        a: ["A1 hücresini toplar","Koşula göre sonuç verir","Hata verir","Metin birleştirir"],
+        correct: 1
+    },
+    {
+        q: "=VLOOKUP(A2, B2:D10, 2, FALSE) ne işe yarar?",
+        a: ["Toplama yapar","Dikey arama yapar","Metin keser","Sayı yuvarlar"],
+        correct: 1
+    },
+    {
+        q: "=INDEX(A1:C10,2,3) ne döndürür?",
+        a: ["2. satır 3. sütun değeri","Toplam","Ortalama","Hata"],
+        correct: 0
+    },
+    {
+        q: "=MATCH(50, A1:A10, 0) ne yapar?",
+        a: ["50 sayısını çarpar","50'nin konumunu bulur","50 ekler","50 siler"],
+        correct: 1
+    },
+    {
+        q: "=SUMIFS(A1:A10, B1:B10, \">5\") ne yapar?",
+        a: ["Tümünü toplar","Koşullu toplama yapar","Ortalama alır","Metin bulur"],
+        correct: 1
+    }
+];
+
+let current = 0;
+let score = 0;
+let currentSelection = null; // Kullanıcının o anki seçimi
+
+function loadQuestion() {
+    currentSelection = null; // Yeni soruya geçince seçimi sıfırla
+    let q = quiz[current];
+    document.getElementById("question").innerHTML = "<h3>" + q.q + "</h3>";
+    
+    let answersHTML = "";
+    q.a.forEach((ans, i) => {
+        answersHTML += `<button class="answer-btn" onclick="selectAnswer(this, ${i})">${ans}</button>`;
+    });
+    document.getElementById("answers").innerHTML = answersHTML;
+}
+
+// Sadece görsel olarak seçer, puanlamayı sonra yapar
+function selectAnswer(element, i) {
+    // Önce tüm butonlardan seçim rengini kaldır
+    const buttons = document.querySelectorAll('.answer-btn');
+    buttons.forEach(btn => btn.classList.remove('selected-choice'));
+    
+    // Tıklanan butonu renklendir
+    element.classList.add('selected-choice');
+    
+    // Seçimi kaydet
+    currentSelection = i;
+}
+
+function nextQuestion() {
+    // Eğer hiçbir şey seçilmemişse uyarı ver
+    if (currentSelection === null) {
+        alert("Lütfen bir seçenek belirleyin!");
+        return;
+    }
+
+    // Puan kontrolünü burada yapıyoruz
+    if (currentSelection === quiz[current].correct) {
+        score++;
+    }
+
+    current++;
+    if (current < quiz.length) {
+        loadQuestion();
+    } else {
+        showResult();
+    }
+}
+
+function showResult() {
+    document.getElementById("question").innerHTML = "<h3>Quiz Bitti!</h3>";
+    document.getElementById("answers").innerHTML = "<h4>Toplam Skorunuz: " + score + " / " + quiz.length + "</h4>";
+    document.getElementById("next-btn").style.display = "none";
+}
+
+loadQuestion();
+</script>
+
+</body>
+</html>
